@@ -1,0 +1,14 @@
+{% load crispy_forms_tags %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% if task.pk %}
+<form id="#form" method="POST" action="{% url 'task_update' pk=task.pk%}">
+{% else %}
+<form id="#form" method="POST" action="{% url "task_create" %}" >
+{% endif %}
+
+          {% csrf_token %}
+          {{form|crispy}}
+
+          <button class="btn btn-success" type="submit">Salvar</button>
+          <a href="{% url 'task_list' %}" class="btn btn-danger">Voltar</a>
+        </form>

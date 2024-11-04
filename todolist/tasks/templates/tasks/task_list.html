@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+{% block title %}Lista de Tarefas{% endblock title %}
+{% block content %}
+            {% if task_list %}
+                <table class="table table-hover">
+                        <thead>
+                            <tr>
+                            <th scope="col">Nome da Tarefa</th>
+                            <th scope="col">Custo</th>
+                            <th scope="col">Data Limite</th>
+                            <th scope="col">Ações</th>
+                            </tr>
+                        </thead>
+                    
+                    <tbody id="tableBody">
+                        
+                        {% for task in task_list%}
+                        {% if task.cost >= 1000 %}
+                        <tr data-id="{{task.pk}}" class="table-warning">
+                        {% else %}
+                        <tr data-id="{{task.pk}}">
+                        {% endif %}
+                            <td>{{task.name}}</td>
+                            <td>R$ {{task.cost|floatformat:2}}</td>
+                            <td>{{task.deadline}}</td>
+                            <td>
+                                <button type="button" data-id="{{task.pk}}" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                                    Editar
+                                  </button>
+                                  <button type="button" data-id="{{task.pk}}" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
+                                    Excluir
+                                  </button>
+                            </td>
+                            <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <h1 class="modal-title fs-5" id="staticBackdropLabel">Editar Tarefa</h1>
+                                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body" id="modalBody">
+                                      <!--Formulário-->
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="modal fade" id="confirmDeleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <h1 class="modal-title fs-5" id="confirmDeleteModalLabel">Excluir Tarefa</h1>
+                                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body" id="deleteModalBody">
+                                      <!--Formulário-->
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="messageModalLabel">Mensagem</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body" id="messageModalBody">
+                                            <!-- Mensagem a ser exibida aqui -->
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            
+
+                              <script>
+                                  $(document).ready(function() {
+
+                                      // Quando o botão do modal for acionado
+                                      $('#staticBackdrop').on('show.bs.modal', function (event) {
+                                          var button = $(event.relatedTarget); // Botão que acionou o modal
+                                          var taskId = button.data('id'); // Obtém o ID da tarefa, se aplicável
+                                          var url = "{% url 'task_update' pk=0 %}".replace("0", taskId); // Define a URL com base no ID
+                                          
+                                          // Faz a requisição AJAX para carregar o formulário
+                                          $.ajax({
+                                              url: url,
+                                              type: "GET",
+                                              success: function(data) {
+                                                  $("#modalBody").html(data); // Carrega o conteúdo no modal
+                                              },
+                                              error: function(xhr, status, error) {
+                                                  console.error("Erro ao carregar o formulário:", error);
+                                              }
+                                          });
+                                      });
+                                  });
+                                </script>
+
+
+                                
+                                <script>
+                                  $(document).ready(function() {
+
+                                    // Quando o botão do modal for acionado
+                                    $('#confirmDeleteModal').on('show.bs.modal', function (event) {
+                                        var button = $(event.relatedTarget); // Botão que acionou o modal
+                                        var taskId = button.data('id'); // Obtém o ID da tarefa, se aplicável
+                                        var url = "{% url 'task_delete' pk=0 %}".replace("0", taskId); // Define a URL com base no ID
+                                        console.log("task.id= "+{{task.id}})
+                                        console.log("data-id= "+taskId)
+                                        
+                                        // Faz a requisição AJAX para carregar o formulário
+                                        $.ajax({
+                                            url: url,
+                                            type: "GET",
+                                            success: function(data) {
+                                                $("#deleteModalBody").html(data); // Carrega o conteúdo no modal
+                                            },
+                                            error: function(xhr, status, error) {
+                                                console.error("Erro ao carregar o formulário:", error);
+                                            }
+                                        });
+                                    });
+                                });
+                              </script>
+                            
+                            </tr>
+                            
+                        {% endfor %}                        
+                    </tbody>   
+                </table>
+                  
+                {% if request.GET.error %}
+
+                <div class="alert alert-danger" role="alert">
+                  {{request.GET.error|escape|safe}}
+                </div>
+                {% endif %}
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.3/Sortable.min.js" integrity="sha512-8AwTn2Tax8NWI+SqsYAXiKT8jO11WUBzTEWRoilYgr5GWnF4fNqBRD+hCr4JRSA1eZ/qwbI+FPsM3X/PQeHgpQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                <script>
+                    $(document).ready(function () {
+                        let element = document.getElementById('tableBody');
+                    
+                        new Sortable(element, {
+                            animation: 350,
+                            onEnd: function (evt) {
+                                updateOrder();
+                            }
+                        });
+                    
+                        function updateOrder() {
+                            const tasks = Array.from(element.children);
+                            const orderUpdates = [];
+                    
+                            tasks.forEach((task, index) => {
+                                const taskId = task.getAttribute('data-id');
+                                orderUpdates.push({
+                                    id: taskId,
+                                    order: index + 1 // Define a nova ordem
+                                });
+                            });
+                    
+                            // Envia as atualizações para o servidor
+                            $.ajax({
+                                url: '/update-order/',
+                                type: 'POST',
+                                data: {
+                                    tasks: JSON.stringify(orderUpdates),
+                                    csrfmiddlewaretoken: '{{ csrf_token }}'  // Adiciona CSRF token
+                                },
+                                success: function (response) {
+                                    console.log('Ordem atualizada com sucesso:', response);
+                                },
+                                error: function (xhr, status, error) {
+                                    console.error('Erro ao atualizar a ordem:', error);
+                                }
+                            });
+                        }
+                    });
+                </script>
+
+
+                
+            {% else %}
+                <h5>Nenhuma tarefa cadastrada</h5>
+            {% endif %}
+            <button type="button" data-id="new" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#staticBackdropNew">
+                Nova Tarefa
+              </button>
+            <div class="modal fade" id="staticBackdropNew" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropNewLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h1 class="modal-title fs-5" id="staticBackdropNewLabel">Nova Tarefa</h1>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="modalBodyNew">
+                      <!--Formulário-->
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <script>
+                $(document).ready(function() {
+
+                    // Quando o botão do modal for acionado
+                    $('#staticBackdropNew').on('show.bs.modal', function (event) {
+                        var button = $(event.relatedTarget); // Botão que acionou o modal
+                        var url = "{% url 'task_create' %}"; // Define a URL com base no ID
+                        
+                        // Faz a requisição AJAX para carregar o formulário
+                        $.ajax({
+                            url: url,
+                            type: "GET",
+                            success: function(data) {
+                                $("#modalBodyNew").html(data); // Carrega o conteúdo no modal
+                            },
+                            error: function(xhr, status, error) {
+                                console.error("Erro ao carregar o formulário:", error);
+                            }
+                        });
+                    });
+                });
+            </script>
+              
+        
+{% endblock content %}

@@ -1,0 +1,8 @@
+{% block content %}
+    <p>Tem certeza que deseja excluir a tarefa <strong>"{{task.name}}?"</strong></p>
+    <form id="#form" method="POST" action="{% url 'task_delete' pk=task.pk%}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Sim</button>
+        <a href="{% url "task_list" %}" class="btn btn-danger">Não</a>
+    </form>
+{% endblock content %}
