@@ -26,7 +26,7 @@ SECRET_KEY = config
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool, default=False)
 
-ALLOWED_HOSTS = ["https://caiorcoutinho.pythonanywhere.com", "localhost"]
+ALLOWED_HOSTS = ["https://caiorcoutinho.pythonanywhere.com"]
 
 
 # Application definition
@@ -126,6 +126,7 @@ USE_I18N = True
 
 USE_TZ = True
 
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
@@ -139,4 +140,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
 CRISPY_TEMPLATE_PACK = "bootstrap5"
-
