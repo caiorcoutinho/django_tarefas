@@ -1,6 +1,8 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 from .models import Task
 
@@ -27,19 +29,13 @@ class TaskUpdateView(UpdateView):
     fields = ['name', 'cost', 'deadline']
     success_url = reverse_lazy("task_list")
     def form_invalid(self, form):
-        """If the form is valid, redirect to the supplied URL."""
         return HttpResponseRedirect(self.get_success_url())
 
 class TaskDeleteView(DeleteView):
     model = Task
     success_url = reverse_lazy("task_list")
 
-from django.http import HttpResponseRedirect, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-import json
-from .models import Task
 
-@csrf_exempt  # Use com cautela em produção!
 def update_task_order(request):
     if request.method == 'POST':
         try:
